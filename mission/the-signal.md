@@ -2,44 +2,76 @@
 
 The reason for everything.
 
+---
+
 ## Discovery
 
-[TBD: Fill in details]
-- **When detected:** [Recently—weeks? months? a year ago?]
-- **Detected by:** [Which array? Who noticed first?]
-- **Initial reaction:** [Kept secret? Announced publicly? Leaked?]
+**Date:** September 15, 2225  
+**Detection:** Deep Space Monitoring Array Epsilon-7 (located in outer Belt)  
+**Initial Classification:** Unknown artificial signal
 
-## Characteristics
+At 0342 UTC, automated systems detected anomalous radio emission from beyond solar system. Initial assumption: equipment malfunction. But cross-check with other arrays confirmed it. The signal was real, external, and artificial.
 
-What we know:
-- **Clearly artificial:** Not natural phenomena. Mathematical structure, patterns that don't occur in nature.
-- **Origin:** Interstellar space. [TBD: How far? Which direction? Specific star system?]
-- **Content:** [TBD: What does it contain?]
-  - Mathematical sequences?
-  - Encoded information?
-  - A simple repeating beacon?
-  - Something more complex?
+---
 
-## Why FTL Is the Only Option
+## Signal Characteristics
 
-- The Signal originates far enough away that sublight travel would take hundreds of years
-- Even at best-case interplanetary speeds, a probe would arrive long after everyone who sent it is dead
-- FTL makes investigation possible within a human lifetime
-- But FTL ships are rare and valuable—this is a major commitment
+| Property | Value |
+|----------|-------|
+| Origin | ~45-50 light-years distant |
+| Direction | Roughly toward Tau Ceti (but offset 15 degrees—NOT from Tau Ceti itself) |
+| Frequency | 1420 MHz (hydrogen line—universal beacon frequency) |
+| Pattern | Repeating mathematical sequence: primes, then increasingly complex concepts |
+| Nature | Directed transmission—we're detecting spillover, not a beacon aimed at us |
+| Duration | Continuous since detection |
 
-## Open Questions
+**Key insight:** The signal isn't meant for us—we're eavesdropping. Like radio waves that leaked past Earth into space during our broadcast era. We're catching spillover from a targeted transmission.
 
-The mission exists to answer these:
-- What is sending the Signal?
-- Is it still active, or are we detecting ancient echoes?
-- Is it a beacon meant to attract attention? A warning? Something else?
-- Is anyone—or anything—still there?
+---
 
-## Theories (In-Universe)
+## Analysis and Debate (September-December 2225)
 
-[TBD: What do people in the setting think?]
-- First contact optimists: Friendly aliens want to meet us
-- Pessimists: It's a trap, or a warning to stay away
-- Scientists: Reserve judgment until we have data
-- Religious groups: [Various interpretations]
-- Skeptics: Instrument error, natural phenomena we don't understand yet
+### Scientific Community:
+- Immediate excitement—first evidence of extraterrestrial intelligence
+- Demands for careful analysis before response
+- Concerns about contamination of data
+
+### Federal Government:
+- Security concerns—unknown technology, unknown intentions
+- Political considerations—which bloc claims credit/control
+- Resource allocation—FTL mission is enormously expensive
+
+### Public Reaction:
+- Initial skepticism (hoax accusations)
+- Religious responses ranging from apocalyptic to welcoming
+- Demands for transparency vs. security classification
+
+### Corporate Interests:
+- Potential commercial applications of alien technology
+- Offers to fund/participate in mission
+- Concerns about Federal monopoly on contact
+
+---
+
+## The Decision
+
+After three months of analysis, Federal Council voted 13-2 to authorize mission.
+
+**Launch Date:** January 15, 2226
+
+---
+
+## What the Signal Proves
+
+- We are not alone
+- Someone is out there, transmitting
+- They use mathematics and the hydrogen line (universal concepts)
+- They have technology at least comparable to ours
+
+## What We Don't Know
+
+- What is sending it? (Probe? Ship? Installation? Planet-bound civilization?)
+- Is the source still active, or are we detecting ancient echoes?
+- Is it a beacon? A warning? Routine communication we're intercepting?
+- Do they know we exist?
+- Do they know we're coming?

@@ -1,39 +1,79 @@
 # The Asteroid Belt
 
-The industrial engine of human civilization. Raw materials flow inward from here to feed Earth, Mars, and the Moon.
+**Population:** ~8 million (estimated, many unregistered)  
+**Status:** Federal jurisdiction, corporate dominated, fragmentary governance  
+**Gravity:** Varies (typically <0.1g)  
+**Economy:** Mining, refining, manufacturing, smuggling
 
-## Character
+The Belt is humanity's industrial heartland and Wild West simultaneously. Millions of asteroids, thousands of operations, minimal central authority.
 
-- "Full of mining colonies and stations of all sizes"
-- Ranges from major corporate stations to one-family rock-hopper operations
-- Rough, practical, working-class culture
-- Communication delay to Earth: ~15-25 minutes depending on orbital positions
+---
 
-## Governance
+## Major Locations
 
-[TBD: How is the Belt governed?]
-- Earth federal authority extends here, but enforcement is spotty?
-- Megacorps effectively run their own stations?
-- Belter unions or independent associations?
-- Tension between Earth regulations and Belt realities?
+### Ceres
+**Population:** 2.3 million
 
-## Economy
+The Belt's capital. Actual gravity (0.029g) from rotation. Pressurized caverns throughout, surface domes, full city infrastructure. Ceres is where Belt profits get spent, where families live, where rough miners come to feel civilized.
 
-- Mining: metals, water ice, rare elements
-- Manufacturing: easier to build big things in microgravity
-- Shipyards? Some of humanity's ships may be Belt-built
+**Governance:** Ceres Municipal Authority, elected council, real democracy. But corporate money influences everything.
 
-## Key Locations
+### Vesta
+**Population:** 400,000
 
-[TBD: Name some stations, settlements, or notable asteroids]
-- Ceres - largest body, probably a major hub
-- Vesta?
-- Corporate stations vs. independent settlements
+Heavy industrial production. Sino-Russian mining corps dominate. Massive refining operations processing ores from thousands of smaller asteroids.
 
-## Belter Culture
+### Pallas
+**Population:** 250,000
 
-[TBD: What makes Belters distinct?]
-- Practical, resourceful, self-reliant
-- View of Earth as distant, bureaucratic, extractive?
-- Distinct accents, slang, traditions?
-- Multi-generational Belters who've never been to a planet?
+Corporate headquarters for Ceres-Pallas Consortium. Think company town—comfortable if you work for the company, unwelcoming if you don't.
+
+### Free Settlements
+
+Dozens of smaller asteroids hosting independent operations:
+- **Psyche:** Metallic asteroid, iron/nickel mining
+- **Hygiea:** Ice mining
+- **Eros:** Near-Earth, transport hub
+
+Each has distinct character.
+
+---
+
+## Corporate Dominance
+
+The Belt belongs to the corporations:
+
+| Corporation | Control | Character |
+|-------------|---------|-----------|
+| Ceres-Pallas Consortium | 30% | Chinese-backed, ruthless, efficient |
+| Vanguard Mining Group | 20% | Western Alliance, better worker conditions |
+| Belt Independents Cooperative | 15% | Association of small operators, declining |
+| Martian Extraction Front | 10% | Mars-based, aggressive, controversial |
+
+Plus dozens of smaller operations.
+
+---
+
+## Life in the Belt
+
+Belt culture is pragmatic, individualistic, suspicious of authority:
+
+- **Independence:** Belters value self-reliance above all. You fix your own suit, solve your own problems
+- **Claim Rights:** Complex informal system of who found what first. Violating claim rights is unforgivable
+- **Mobility:** Belters move between asteroids frequently, following work and opportunity
+- **Class Division:** Corporate employees vs. independents vs. desperate workers. Tension runs high
+- **Federal Skepticism:** The Federal Government is seen as distant, Earth-bound, clueless about Belt realities
+
+---
+
+## The Dark Side
+
+The Belt has problems:
+
+- **Labor Exploitation:** Some corporate operations run prison labor or debt-bonded workers
+- **Claim Jumping:** Stealing someone's stake, sometimes violently
+- **Smuggling:** Untaxed ores, illegal technology, contraband
+- **Piracy:** Raiders hitting vulnerable ore haulers
+- **Corporate Wars:** The 2189 Belt War wasn't the last violent dispute
+
+Federal police presence is minimal—can't patrol millions of asteroids. Justice is often informal and rough.

@@ -1,53 +1,56 @@
 # Megacorporations
 
-Megacorps are "major players and pivotal" in this setting. They're not quite nation-states, but they have enormous resources, their own agendas, and in some cases their own FTL-capable ships.
+In 2225, megacorporations are quasi-sovereign entities with economic might rivaling Earth blocs. They are truly transnational—not aligned with any single bloc.
 
-## Role in the Setting
+---
 
-- Provide resources, technology, infrastructure that government can't
-- Have interests that may align or conflict with Earth federal authority
-- Especially powerful in the Belt and outer system where government reach is weak
-- May have funded part of your mission—with strings attached
+## Corporate Power and Limitations
 
-## Corps to Define
+Megacorps operate under Federal charter but test boundaries constantly:
 
-As the campaign develops, add individual corp files here. Consider:
+### What They Can Do:
+- Operate across entire system with minimal restriction
+- Maintain private security forces
+- Conduct proprietary research
+- Influence Federal policy through lobbying and economic leverage
+- Control vast resources and populations
 
-- **Resource/Mining Corps:** Control Belt operations, raw materials
-- **Aerospace/Shipbuilding Corps:** Build the ships, maybe including yours
-- **Tech/Communications Corps:** Control networks, AI, software
-- **Biotech/Life Support Corps:** Critical for colony survival
-- **Financial Corps:** Fund expeditions, hold debt
+### What They (Officially) Can't Do:
+- Violate Federal law
+- Wage war on each other (2189 was a "security incident")
+- Develop prohibited technologies (AGI, antimatter weapons, FTL)
+- Claim sovereignty over territory
+- Obstruct Federal military operations
 
-## Questions to Answer
+### Reality
+The line between permitted and prohibited is blurry. Corporations push boundaries, Federal Government pushes back, compromise happens. It's a dance of power between entities that need each other but don't fully trust each other.
 
-When creating a corp:
-- What do they control or produce?
-- Where are they strongest (Earth, Mars, Belt, Jupiter)?
-- What's their relationship with the federal government?
-- What do they want from the Signal mission?
-- Who are the key figures?
+---
 
-## Template
+## The Major Players
 
-```markdown
-# [Corp Name]
+| Corporation | Revenue | Employees | Primary Business |
+|-------------|---------|-----------|------------------|
+| Han-Lockheed Orbital | $890B | 2.4M | Spacecraft, advanced propulsion |
+| Ceres-Pallas Consortium | $670B | 1.8M | Asteroid mining, refining |
+| AtmoTech Industries | $420B | 890K | Terraforming, atmospheric processing |
+| Vanguard Mining Group | $380B | 950K | Rare earths, platinum group metals |
+| BioFrontier Corporation | $310B | 680K | Biotech, agricultural systems |
+| SolBank Consortium | $290B | 450K | Banking, finance, insurance |
 
-## Industry
-[What they do]
+See individual corp files for details.
 
-## Power Base
-[Where they're strongest]
+---
 
-## Relationship to Government
-[Allied, adversarial, complicated?]
+## The FTL Problem
 
-## Interest in the Mission
-[What do they want?]
+Corporations desperately want FTL technology:
+- They know it exists (the *Prometheus* isn't exactly subtle)
+- They know the basics (exotic matter, warp field generation)
+- They DON'T know the specific quantum configuration that makes it stable
+- Corporate R&D teams are approaching the problem from different angles
+- None have cracked it yet
+- Espionage against the Federal program is constant
+- **Some corporate "observers" on your mission may have secondary objectives...**
 
-## Key Figures
-[Names as needed]
-
-## Notes
-[Anything else]
-```
+This creates enormous tension. The corporation that cracks FTL—or steals the secret—gains incalculable strategic advantage.

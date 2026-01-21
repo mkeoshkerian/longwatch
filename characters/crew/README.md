@@ -2,27 +2,64 @@
 
 Your bridge crew and key personnel. Add files here as characters are developed.
 
-## Key Positions to Fill
+---
 
-- **First Officer / XO:** Your second in command
-- **Chief Engineer:** Keeps the ship running
-- **Chief Medical Officer:** Doctor
-- **Science Officer:** Lead researcher
-- **Helmsman/Pilot:** Flies the ship
-- **Communications Officer:** Handles comms, signals analysis
-- **Security Chief:** Ship security, tactical
-- **[Others as needed]**
+## Key Positions
 
-## Crew Size
+| Position | Role | Status |
+|----------|------|--------|
+| Executive Officer (XO) | Your second in command | TBD |
+| Chief Science Officer | Lead researcher, first contact specialist | TBD |
+| Chief Engineer | Keeps the ship running, FTL expert | TBD |
+| Chief Medical Officer | Doctor, crew health | TBD |
+| Helmsman/Navigator | Flies the ship, plots courses | TBD |
+| Communications Officer | Comms, signals analysis | TBD |
+| Marine Commander | Ship security, tactical | TBD |
 
-[TBD: How big is your crew?]
-- Small and intimate (10-20)?
-- Medium expedition (50-100)?
-- Large vessel (100+)?
+---
 
-## Template
+## Crew Breakdown
 
-When creating a crew member:
+| Department | Count | Notes |
+|------------|-------|-------|
+| Command | 12 | Captain, XO, Department Heads |
+| Science | 45 | Xenobiologists, physicists, linguists, etc. |
+| Engineering | 35 | Ship systems, FTL maintenance |
+| Medical | 8 | Doctors and nurses |
+| Marines | 20 | Security and combat |
+| Support | 40 | Logistics, comms, other functions |
+| Corporate Observers | 5 | "Scientific specialists" |
+| **Total** | **~180** | |
+
+---
+
+## Corporate Observers
+
+Five corporate representatives are aboard, officially as scientific specialists. In reality:
+- They represent corporate interests
+- Some may have secondary objectives
+- At least one is probably gathering intelligence on FTL technology
+- They have legitimate scientific credentials (Longwatch wouldn't accept otherwise)
+- But their loyalties are... complicated
+
+**Consider:** Which corporations sent them? What are their real orders?
+
+---
+
+## Crew Culture
+
+Longwatch crews are:
+- Post-national (Longwatch identity supersedes bloc origin)
+- Highly competent (85% washout rate in training)
+- Diverse (representatives from all blocs, selected for merit)
+- Idealistic (they believe in the mission)
+- Pragmatic (space doesn't forgive mistakes)
+
+But 180 people on a 3-4 month mission with no contact home, facing the unknown... tensions will emerge.
+
+---
+
+## Template for New Characters
 
 ```markdown
 # [Name]
@@ -31,7 +68,7 @@ When creating a crew member:
 [Position on ship]
 
 ## Background
-[Where they came from, how they got here]
+[Where they came from, how they got here, bloc of origin]
 
 ## Personality
 [What are they like?]
@@ -42,13 +79,9 @@ When creating a crew member:
 ## Relationship with Captain
 [How do they view you? History?]
 
+## Secrets/Complications
+[What aren't they telling you?]
+
 ## Notes
 [Anything else relevant]
 ```
-
-## Crew Dynamics
-
-[TBD: What's the overall vibe?]
-- Military discipline or civilian expedition?
-- Tight-knit or still forming bonds?
-- Any tensions or factions within the crew?

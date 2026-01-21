@@ -1,35 +1,44 @@
-# The Signal - A Sci-Fi Roleplaying World
+# The Longwatch Chronicles: Worldbuilding Bible
 
-A near-future hard sci-fi setting for narrative roleplaying. You are the captain of one of humanity's few FTL-capable ships, sent to investigate an artificial signal from interstellar space.
+A near-future hard sci-fi setting for narrative roleplaying. You are Captain of the UEFS *Prometheus*, humanity's first and only FTL-capable vessel, sent to investigate an artificial signal from interstellar space.
 
-## How to Use This
+## Setting Overview
 
-These docs are the "world bible" for the campaign. When playing:
+- **Year:** 2225-2226 CE
+- **Era:** The Federal Century
+- **Humanity's Reach:** Inner Solar System (established), Jupiter System (frontier), Beyond Jupiter (lawless)
+- **Major Development:** First crewed FTL mission preparing to launch
 
-1. Load the relevant docs into context (Claude Code makes this easy)
-2. Play the narrative
-3. Edit docs directly when you want to change or expand the world
-4. Keep session logs in `/sessions` if you want a record
+The year is 2225, and humanity stands at a threshold. Two centuries of expansion have transformed us from a single-planet species into a sprawling interplanetary civilization. Earth's nations have reorganized into powerful regional blocs united under a Federal Space Government. The Moon hosts over 60 million people. Mars is being terraformed. The asteroid belt churns with mining operations.
 
-## Quick Setting Summary
+Three months ago, deep space monitoring stations detected it: an artificial signal originating from approximately 45-50 light-years distant. The pattern is unmistakable—mathematical, clearly intelligent. It is not a message meant for us; we're detecting spillover from a targeted transmission. But it is real, and it is waiting.
 
-- **When:** ~200 years from now
-- **Where:** Humanity has colonized the solar system; beyond Jupiter is frontier; interstellar is unknown
-- **Tech Level:** Hard sci-fi with one exception—FTL exists but is rare, expensive, and requires massive infrastructure
-- **Tone:** Exploration, mystery, political tension between Earth, corps, and frontier
+Humanity's response: the UEFS *Prometheus*, a Prometheus-class deep space explorer—humanity's first and only FTL-capable vessel—will make the first crewed faster-than-light jump in human history.
 
-## What's Established vs. TBD
-
-Check individual docs for `[TBD]` markers—these are things we haven't nailed down yet and can be decided during play or worldbuilding sessions.
+You are her captain.
 
 ## File Structure
 
 ```
 world/
-├── setting/          # The world itself
-├── factions/         # Power players
-├── technology/       # How things work
-├── mission/          # Your specific mission and ship
-├── characters/       # You and your crew
+├── setting/          # Locations and timeline
+├── factions/         # Political blocs and megacorps
+├── military/         # Fleets and Longwatch
+├── technology/       # FTL, ships, general tech
+├── mission/          # The Signal, your ship, mission parameters
+├── characters/       # Captain and crew
 └── sessions/         # Play logs
 ```
+
+## Quick Reference
+
+| Topic | Key Facts |
+|-------|-----------|
+| Your Ship | UEFS *Prometheus* (only FTL vessel in existence) |
+| Signal Distance | ~45-50 light-years |
+| FTL Speed | ~2 light-years per day |
+| Transit Time | 22-23 days each way |
+| Total Mission | 3-4 months minimum |
+| Communication | None possible once you jump |
+| Crew | ~180 personnel |
+| Launch Date | January 15, 2226 |
