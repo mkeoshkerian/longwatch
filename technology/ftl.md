@@ -99,3 +99,48 @@ Even the Federal scientists aren't certain about:
 - Whether there are range limits beyond theoretical models
 
 You are the test case.
+
+---
+
+## Jump Options
+
+The drive can sustain a warp bubble for extended periods—theoretically indefinitely. But it's never been tested beyond a few days. The crew has two approaches:
+
+### Option A: One Sustained Jump
+- Form the bubble, stay in it for 23 days straight, drop out at destination
+- Faster and more fuel-efficient (one bubble formation)
+- But completely unproven at this duration
+- If something goes wrong mid-transit, no way to stop and fix it
+- The 48-hour cooldown applies AFTER the jump, before you can jump again
+
+### Option B: Multiple Shorter Jumps
+- Jump a few light-years, drop out, 48-hour cooldown, reassess, jump again
+- Takes longer, burns more fuel on repeated bubble formations
+- But you can check systems between jumps, confirm drive stability, make course corrections
+- Safer but tighter on fuel margin
+
+**Both approaches are unproven at interstellar distances. The crew must choose.**
+
+---
+
+## Precision and Emergence
+
+The bubble can be collapsed intentionally at any point—you're not locked into a destination. BUT precision degrades with distance. At 5 light-years, you can target a specific region. At 45 light-years, you're aiming at a general area.
+
+Emerging too close to a gravity well is catastrophic. So you drop out at safe distance and approach on conventional drives.
+
+---
+
+## Failure Scenarios
+
+If the drive fails mid-transit, the bubble collapses and you drop into normal space—wherever you are. In interstellar void, the nearest star might be light-years away. Fusion drives at 0.3g would take decades to reach anything.
+
+The ship has repair capabilities, so if the failure is fixable, you can attempt to re-jump. If not, you're stranded.
+
+---
+
+## The Return Question
+
+The drive doesn't care which direction you're going. You can jump from anywhere to anywhere within range with enough fuel. But nobody has ever made a return jump from interstellar space.
+
+The outbound jump is unproven. The return—after 23 days of continuous operation—is even more uncertain.

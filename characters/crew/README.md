@@ -35,14 +35,16 @@ Your bridge crew and key personnel. Add files here as characters are developed.
 
 ## Corporate Observers
 
-Five corporate representatives are aboard, officially as scientific specialists. In reality:
-- They represent corporate interests
-- Some may have secondary objectives
-- At least one is probably gathering intelligence on FTL technology
-- They have legitimate scientific credentials (Longwatch wouldn't accept otherwise)
-- But their loyalties are... complicated
+5 corporate observers are aboard, distributed across major corps as political compromise. The corporations are rivals—Han-Lockheed, Ceres-Pallas, and others aren't coordinating, they're competing. Their observers may be watching each other as much as the FTL drive.
 
-**Consider:** Which corporations sent them? What are their real orders?
+**The realistic breakdown:**
+- 1-2 are genuine scientists who happen to work for corps. No secret orders. Just doing their job.
+- 1-2 have mild secondary objectives. "Report what you learn about FTL, don't take risks." Passive intelligence gathering.
+- 1 is the real threat. Active espionage mission. Willing to do something about it.
+
+The Captain knows there are 5 corporate observers. Longwatch vetted them, they have real credentials. But everyone assumes at least one has secondary objectives. You don't know which—or how far they'll go.
+
+**The specific identities of these 5 observers are TBD.**
 
 ---
 
