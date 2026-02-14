@@ -8,7 +8,6 @@
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
         body { background: #0f172a; }
         .prose-custom h3 { color: #fbbf24; font-size: 1.125rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem; }
@@ -20,13 +19,59 @@
         ::-webkit-scrollbar-track { background: #1e293b; }
         ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        
+        /* Map styles */
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        @keyframes orbit {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .planet-glow {
+            filter: drop-shadow(0 0 10px currentColor);
+        }
+        .sun-glow {
+            box-shadow: 0 0 60px 20px rgba(255, 200, 50, 0.6), 0 0 100px 40px rgba(255, 150, 0, 0.3);
+        }
+        .orbit-path {
+            fill: none;
+            stroke: rgba(100, 116, 139, 0.3);
+            stroke-width: 1;
+        }
+        .orbit-path-highlight {
+            fill: none;
+            stroke: rgba(251, 191, 36, 0.5);
+            stroke-width: 2;
+            stroke-dasharray: 8 4;
+        }
+        .travel-route {
+            stroke: rgba(251, 191, 36, 0.6);
+            stroke-width: 2;
+            stroke-dasharray: 5 5;
+            animation: dash 20s linear infinite;
+        }
+        @keyframes dash {
+            to { stroke-dashoffset: -100; }
+        }
     </style>
 </head>
 <body>
     <div id="root"></div>
     
     <script type="text/babel">
-        const { useState, useMemo } = React;
+        const { useState, useMemo, useEffect, useRef } = React;
 
         // ============ ICONS ============
         const Icons = {
@@ -42,7 +87,10 @@
             Radio: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"></path></svg>,
             Rocket: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path></svg>,
             Globe: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>,
-            X: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            X: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
+            ZoomIn: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>,
+            ZoomOut: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>,
+            Navigation: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
         };
 
         // ============ DATA ============
@@ -74,13 +122,121 @@
             ],
             
             locations: {
-                earth: { name: "Earth", type: "planet", population: "11.2 billion", status: "Divided among five major blocs", description: "Humanity's homeworld remains divided among the great blocs, but united through the Federal Space Government for extraterrestrial affairs. The consolidation of the mid-21st century—driven by the semiconductor crisis and the logic of economic interdependence—produced the political structure that still governs.", coordinates: { x: 50, y: 50 }, color: "#4A90D9" },
-                luna: { name: "Luna", type: "moon", population: "62 million", status: "Federal administered, Earth bloc territories", description: "Humanity's second home and the closest thing to a post-national society. Five generations have created a distinct Lunar identity. Pragmatic, surveillance-accepting, gravity-adapted. Major settlements: New Armstrong (12M), Tsiolkovsky (8M), Europa Station (6M). Gateway L5 serves as the logistics hub for the entire system.", coordinates: { x: 55, y: 48 }, color: "#C0C0C0" },
-                mars: { name: "Mars", type: "planet", population: "47 million", status: "Autonomous governance within Federal framework", description: "The great project. A world being terraformed over centuries. Atmosphere thickening, temperatures rising, engineered organisms spreading. Martians think in generations. The Autonomist movement grows—resentment of Earth governance, demands for independence. Major settlements: Mariner Station (8M), Zhurong Base (5M), Hellas Basin Collective (4M), Olympus City (3M).", coordinates: { x: 62, y: 45 }, color: "#CD5C5C" },
-                venus: { name: "Venus", type: "planet", population: "180,000 (orbital)", status: "Federal administered, Pan-European dominated", description: "Hell below, heaven above. Surface temperature melts lead; orbital stations house humanity's elite engineers. The Cytherean Families—three generations born in Venus orbit—have become a distinct culture. Proud, insular, technically peerless. They've threatened mass resignation three times over policy disputes. Three times, the Federation capitulated.", coordinates: { x: 42, y: 52 }, color: "#DEB887" },
-                belt: { name: "Asteroid Belt", type: "region", population: "~8 million", status: "Federal jurisdiction, corporate dominated", description: "The law ends here. Pragmatism rules. Ceres (2.3M) is the closest thing to civilization—actual governance, actual services. Vesta (400K) is industrial hell, Sino-Russian corporations optimizing for output. Beyond that: countless smaller operations, independent prospectors, and people who need to disappear. Violence is common. Help is rare.", coordinates: { x: 70, y: 50 }, color: "#8B7355" },
-                jupiter: { name: "Jupiter System", type: "system", population: "320,000", status: "Federal jurisdiction (barely), frontier", description: "The frontier. Where Federal authority frays. Ganymede Station (180K) serves as Longwatch HQ and site of the FTL breakthrough. Europa hosts researchers studying the subsurface ocean—possible alien life beneath the ice. Callisto processes resources. This is where civilization ends and the unknown begins.", coordinates: { x: 78, y: 48 }, color: "#DAA520" },
-                saturn: { name: "Saturn & Beyond", type: "system", population: "50-100,000 (estimated)", status: "Effectively lawless", description: "Beyond Jupiter, Federal authority is a polite fiction. New Shanghai on Titan: Han-Lockheed's corporate city-state where laws don't reach. The ring settlements: miners, religious communities, pirates, refugees. No one knows the real population because many prefer not to be counted. This is where you go to disappear.", coordinates: { x: 88, y: 52 }, color: "#F4A460" }
+                earth: { 
+                    name: "Earth", 
+                    type: "planet", 
+                    population: "11.2 billion",
+                    populationNum: 11200000000,
+                    status: "Divided among five major blocs", 
+                    description: "Humanity's homeworld remains divided among the great blocs, but united through the Federal Space Government for extraterrestrial affairs. The consolidation of the mid-21st century—driven by the semiconductor crisis and the logic of economic interdependence—produced the political structure that still governs.",
+                    factions: ["Sino-Russian Sphere", "Pan-European Federation", "Western Hemisphere Alliance", "African Union", "Aligned States"],
+                    facilities: ["Federal HQ (Geneva)", "UN Legacy Council", "Global Launch Network"],
+                    orbitRadius: 100,
+                    size: 28,
+                    colors: { primary: "#4A90D9", secondary: "#2E5A8B", atmosphere: "rgba(100, 180, 255, 0.3)" },
+                    travelTimes: { luna: "3 days", mars: "3-6 months", venus: "4-5 months", belt: "6-8 months", jupiter: "2-3 years", saturn: "4-6 years" }
+                },
+                luna: { 
+                    name: "Luna", 
+                    type: "moon", 
+                    population: "62 million",
+                    populationNum: 62000000,
+                    status: "Federal administered, Earth bloc territories", 
+                    description: "Humanity's second home and the closest thing to a post-national society. Five generations have created a distinct Lunar identity. Pragmatic, surveillance-accepting, gravity-adapted. Major settlements: New Armstrong (12M), Tsiolkovsky (8M), Europa Station (6M). Gateway L5 serves as the logistics hub for the entire system.",
+                    factions: ["Federal Space Government", "All major blocs present"],
+                    facilities: ["New Armstrong (12M)", "Tsiolkovsky (8M)", "Europa Station (6M)", "Gateway L5", "Vandenberg Hall"],
+                    orbitRadius: 115,
+                    size: 12,
+                    colors: { primary: "#C0C0C0", secondary: "#808080", atmosphere: "rgba(200, 200, 200, 0.2)" },
+                    travelTimes: { earth: "3 days", mars: "3-6 months", belt: "5-7 months", jupiter: "2-3 years" }
+                },
+                venus: { 
+                    name: "Venus", 
+                    type: "planet", 
+                    population: "180,000 (orbital)",
+                    populationNum: 180000,
+                    status: "Federal administered, Pan-European dominated", 
+                    description: "Hell below, heaven above. Surface temperature melts lead; orbital stations house humanity's elite engineers. The Cytherean Families—three generations born in Venus orbit—have become a distinct culture. Proud, insular, technically peerless. They've threatened mass resignation three times over policy disputes. Three times, the Federation capitulated.",
+                    factions: ["Pan-European Federation", "Cytherean Families"],
+                    facilities: ["Cytherean Prime (45K)", "Ishtar Station (18K)", "Aphrodite Complex (12K)", "Atmospheric Processing Network"],
+                    orbitRadius: 70,
+                    size: 26,
+                    colors: { primary: "#DEB887", secondary: "#D2691E", atmosphere: "rgba(255, 200, 150, 0.4)" },
+                    travelTimes: { earth: "4-5 months", mars: "5-7 months", belt: "8-10 months" }
+                },
+                mars: { 
+                    name: "Mars", 
+                    type: "planet", 
+                    population: "47 million",
+                    populationNum: 47000000,
+                    status: "Autonomous governance within Federal framework", 
+                    description: "The great project. A world being terraformed over centuries. Atmosphere thickening, temperatures rising, engineered organisms spreading. Martians think in generations. The Autonomist movement grows—resentment of Earth governance, demands for independence. Major settlements: Mariner Station (8M), Zhurong Base (5M), Hellas Basin Collective (4M), Olympus City (3M).",
+                    factions: ["Western Hemisphere Alliance", "Sino-Russian Sphere", "Martian Autonomists"],
+                    facilities: ["Mariner Station (8M)", "Zhurong Base (5M)", "Hellas Basin (4M)", "Olympus City (3M)", "Terraforming Grid"],
+                    orbitRadius: 150,
+                    size: 20,
+                    colors: { primary: "#CD5C5C", secondary: "#8B3A3A", atmosphere: "rgba(255, 150, 100, 0.25)" },
+                    travelTimes: { earth: "3-6 months", luna: "3-6 months", belt: "2-4 months", jupiter: "1-2 years" }
+                },
+                belt: { 
+                    name: "Asteroid Belt", 
+                    type: "region", 
+                    population: "~8 million",
+                    populationNum: 8000000,
+                    status: "Federal jurisdiction, corporate dominated", 
+                    description: "The law ends here. Pragmatism rules. Ceres (2.3M) is the closest thing to civilization—actual governance, actual services. Vesta (400K) is industrial hell, Sino-Russian corporations optimizing for output. Beyond that: countless smaller operations, independent prospectors, and people who need to disappear. Violence is common. Help is rare.",
+                    factions: ["Ceres-Pallas Consortium", "Vanguard Mining", "Federal Patrols", "Independents"],
+                    facilities: ["Ceres (2.3M)", "Vesta (400K)", "Pallas (250K)", "Countless mining ops"],
+                    orbitRadius: 220,
+                    size: 8,
+                    isRing: true,
+                    colors: { primary: "#8B7355", secondary: "#6B5344", atmosphere: null },
+                    travelTimes: { mars: "2-4 months", jupiter: "8-12 months", earth: "6-8 months" }
+                },
+                jupiter: { 
+                    name: "Jupiter System", 
+                    type: "system", 
+                    population: "320,000",
+                    populationNum: 320000,
+                    status: "Federal jurisdiction (barely), frontier", 
+                    description: "The frontier. Where Federal authority frays. Ganymede Station (180K) serves as Longwatch HQ and site of the FTL breakthrough. Europa hosts researchers studying the subsurface ocean—possible alien life beneath the ice. Callisto processes resources. This is where civilization ends and the unknown begins.",
+                    factions: ["Longwatch", "Federal Space Government", "Research Consortiums"],
+                    facilities: ["Ganymede Station (180K) — Longwatch HQ", "Europa Research (25K)", "Callisto Ops (45K)", "Io Automated", "Galilean Shipyards"],
+                    orbitRadius: 310,
+                    size: 50,
+                    colors: { primary: "#DAA520", secondary: "#B8860B", atmosphere: "rgba(255, 200, 100, 0.3)", bands: ["#DAA520", "#CD853F", "#DEB887", "#D2691E"] },
+                    travelTimes: { earth: "2-3 years", mars: "1-2 years", belt: "8-12 months", saturn: "2-3 years" }
+                },
+                saturn: { 
+                    name: "Saturn & Beyond", 
+                    type: "system", 
+                    population: "50-100,000 (estimated)",
+                    populationNum: 75000,
+                    status: "Effectively lawless", 
+                    description: "Beyond Jupiter, Federal authority is a polite fiction. New Shanghai on Titan: Han-Lockheed's corporate city-state where laws don't reach. The ring settlements: miners, religious communities, pirates, refugees. No one knows the real population because many prefer not to be counted. This is where you go to disappear.",
+                    factions: ["Han-Lockheed Orbital", "Criminal enterprises", "Religious separatists", "Refugees"],
+                    facilities: ["New Shanghai, Titan (30-40K)", "Ring Settlements", "Enceladus Research (80)", "Iapetus Station (150)"],
+                    orbitRadius: 420,
+                    size: 44,
+                    hasRings: true,
+                    colors: { primary: "#F4A460", secondary: "#DEB887", atmosphere: "rgba(244, 200, 150, 0.2)", rings: "rgba(210, 180, 140, 0.5)" },
+                    travelTimes: { jupiter: "2-3 years", earth: "4-6 years", belt: "2-4 years" }
+                },
+                signal: {
+                    name: "The Signal",
+                    type: "signal",
+                    population: "Unknown",
+                    populationNum: 0,
+                    status: "45-50 light-years distant",
+                    description: "The reason for everything. Detected September 2225. Artificial, mathematical, clearly intelligent. We're not detecting a message meant for us—we're eavesdropping on someone else's conversation. The source lies roughly toward Tau Ceti, but offset 15 degrees. NOT from Tau Ceti itself.",
+                    factions: ["Unknown"],
+                    facilities: ["Signal Source (Unknown)"],
+                    orbitRadius: 520,
+                    size: 16,
+                    isSignal: true,
+                    colors: { primary: "#fbbf24", secondary: "#f59e0b", atmosphere: "rgba(251, 191, 36, 0.4)" },
+                    travelTimes: { jupiter: "22-23 days (FTL)", earth: "45-50 years (light)" }
+                }
             },
             
             factions: {
@@ -510,7 +666,498 @@ Their children sometimes visit Taiwan as tourists, speaking Mandarin with foreig
             }
         };
 
-        // ============ COMPONENTS ============
+        // ============ ENHANCED MAP COMPONENT ============
+        
+        const EnhancedSolarSystemMap = ({ onLocationSelect, selectedLocation }) => {
+            const [zoom, setZoom] = useState(1);
+            const [hoveredLocation, setHoveredLocation] = useState(null);
+            const [showRoutes, setShowRoutes] = useState(false);
+            const [routeFrom, setRouteFrom] = useState(null);
+            const mapRef = useRef(null);
+            
+            const centerX = 500;
+            const centerY = 300;
+            
+            // Generate stars
+            const stars = useMemo(() => {
+                const s = [];
+                for (let i = 0; i < 200; i++) {
+                    s.push({
+                        x: Math.random() * 1000,
+                        y: Math.random() * 600,
+                        size: Math.random() * 2 + 0.5,
+                        delay: Math.random() * 3
+                    });
+                }
+                return s;
+            }, []);
+            
+            const locations = Object.entries(worldData.locations);
+            
+            const getLocationPosition = (loc) => {
+                const angle = {
+                    earth: 0,
+                    luna: 0.3,
+                    venus: 2.5,
+                    mars: 0.8,
+                    belt: 1.5,
+                    jupiter: 2.2,
+                    saturn: 3.5,
+                    signal: 4.2
+                };
+                const a = angle[loc] || 0;
+                const r = worldData.locations[loc].orbitRadius * zoom;
+                return {
+                    x: centerX + Math.cos(a) * r,
+                    y: centerY + Math.sin(a) * r * 0.4
+                };
+            };
+            
+            const renderPlanet = (id, loc, pos) => {
+                const isSelected = selectedLocation === id;
+                const isHovered = hoveredLocation === id;
+                const size = loc.size * zoom;
+                
+                if (loc.isSignal) {
+                    return (
+                        <g key={id}>
+                            {/* Signal pulses */}
+                            <circle cx={pos.x} cy={pos.y} r={size * 2} fill="none" stroke="#fbbf24" strokeWidth="1" opacity="0.3">
+                                <animate attributeName="r" from={size} to={size * 3} dur="2s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" from="0.5" to="0" dur="2s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx={pos.x} cy={pos.y} r={size * 1.5} fill="none" stroke="#fbbf24" strokeWidth="1" opacity="0.5">
+                                <animate attributeName="r" from={size} to={size * 3} dur="2s" begin="0.5s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" from="0.5" to="0" dur="2s" begin="0.5s" repeatCount="indefinite" />
+                            </circle>
+                            {/* Core */}
+                            <circle 
+                                cx={pos.x} 
+                                cy={pos.y} 
+                                r={size / 2}
+                                fill="#fbbf24"
+                                style={{ filter: 'drop-shadow(0 0 10px #fbbf24)' }}
+                            />
+                            <text x={pos.x} y={pos.y - size - 5} textAnchor="middle" fill="#fbbf24" fontSize="11" fontWeight="bold">?</text>
+                        </g>
+                    );
+                }
+                
+                if (loc.isRing) {
+                    // Asteroid belt
+                    const asteroids = [];
+                    for (let i = 0; i < 40; i++) {
+                        const angle = (i / 40) * Math.PI * 2;
+                        const variance = (Math.random() - 0.5) * 20 * zoom;
+                        const r = loc.orbitRadius * zoom + variance;
+                        asteroids.push({
+                            x: centerX + Math.cos(angle) * r,
+                            y: centerY + Math.sin(angle) * r * 0.4,
+                            size: Math.random() * 3 + 1
+                        });
+                    }
+                    return (
+                        <g key={id}>
+                            {asteroids.map((a, i) => (
+                                <circle key={i} cx={a.x} cy={a.y} r={a.size} fill={loc.colors.primary} opacity="0.7" />
+                            ))}
+                        </g>
+                    );
+                }
+                
+                return (
+                    <g key={id}>
+                        {/* Atmosphere glow */}
+                        {loc.colors.atmosphere && (
+                            <circle 
+                                cx={pos.x} 
+                                cy={pos.y} 
+                                r={size * 1.3}
+                                fill={loc.colors.atmosphere}
+                                style={{ filter: `blur(${size/4}px)` }}
+                            />
+                        )}
+                        
+                        {/* Saturn's rings */}
+                        {loc.hasRings && (
+                            <ellipse 
+                                cx={pos.x} 
+                                cy={pos.y} 
+                                rx={size * 1.8} 
+                                ry={size * 0.5}
+                                fill="none"
+                                stroke={loc.colors.rings}
+                                strokeWidth={size * 0.3}
+                                transform={`rotate(-15 ${pos.x} ${pos.y})`}
+                            />
+                        )}
+                        
+                        {/* Planet body */}
+                        <defs>
+                            <radialGradient id={`planet-${id}`} cx="30%" cy="30%">
+                                <stop offset="0%" stopColor={loc.colors.primary} />
+                                <stop offset="100%" stopColor={loc.colors.secondary} />
+                            </radialGradient>
+                            {loc.colors.bands && (
+                                <pattern id={`bands-${id}`} patternUnits="userSpaceOnUse" width={size*2} height={size/3}>
+                                    {loc.colors.bands.map((c, i) => (
+                                        <rect key={i} x="0" y={i * size/6} width={size*2} height={size/6} fill={c} />
+                                    ))}
+                                </pattern>
+                            )}
+                        </defs>
+                        
+                        <circle 
+                            cx={pos.x} 
+                            cy={pos.y} 
+                            r={size}
+                            fill={loc.colors.bands ? `url(#bands-${id})` : `url(#planet-${id})`}
+                            stroke={isSelected ? "#fbbf24" : isHovered ? "#94a3b8" : "transparent"}
+                            strokeWidth={isSelected ? 3 : 2}
+                            style={{ 
+                                cursor: 'pointer',
+                                filter: isSelected ? 'drop-shadow(0 0 15px #fbbf24)' : isHovered ? 'drop-shadow(0 0 10px #94a3b8)' : 'none'
+                            }}
+                            onClick={() => onLocationSelect(id)}
+                            onMouseEnter={() => setHoveredLocation(id)}
+                            onMouseLeave={() => setHoveredLocation(null)}
+                        />
+                        
+                        {/* Moons for Jupiter */}
+                        {id === 'jupiter' && (
+                            <>
+                                <circle cx={pos.x + size * 1.4} cy={pos.y - size * 0.3} r={4} fill="#a0a0a0" />
+                                <circle cx={pos.x - size * 1.3} cy={pos.y + size * 0.4} r={5} fill="#d4a574" />
+                                <circle cx={pos.x + size * 0.2} cy={pos.y - size * 1.3} r={6} fill="#8fbc8f" />
+                            </>
+                        )}
+                    </g>
+                );
+            };
+            
+            const renderHoverInfo = () => {
+                if (!hoveredLocation || hoveredLocation === selectedLocation) return null;
+                const loc = worldData.locations[hoveredLocation];
+                const pos = getLocationPosition(hoveredLocation);
+                
+                return (
+                    <foreignObject x={pos.x + 20} y={pos.y - 60} width="200" height="120">
+                        <div className="bg-slate-800/95 border border-slate-600 rounded-lg p-3 text-xs">
+                            <div className="font-bold text-amber-400">{loc.name}</div>
+                            <div className="text-slate-300">{loc.population}</div>
+                            <div className="text-slate-500 mt-1">{loc.status}</div>
+                            <div className="text-slate-400 mt-2 text-[10px]">Click for details</div>
+                        </div>
+                    </foreignObject>
+                );
+            };
+            
+            return (
+                <div className="relative w-full bg-slate-950 rounded-lg overflow-hidden border border-slate-700">
+                    {/* Controls */}
+                    <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
+                        <button 
+                            onClick={() => setZoom(z => Math.min(z + 0.2, 2))}
+                            className="bg-slate-800/90 hover:bg-slate-700 p-2 rounded border border-slate-600"
+                        >
+                            <Icons.ZoomIn />
+                        </button>
+                        <button 
+                            onClick={() => setZoom(z => Math.max(z - 0.2, 0.5))}
+                            className="bg-slate-800/90 hover:bg-slate-700 p-2 rounded border border-slate-600"
+                        >
+                            <Icons.ZoomOut />
+                        </button>
+                        <button 
+                            onClick={() => setShowRoutes(!showRoutes)}
+                            className={`p-2 rounded border ${showRoutes ? 'bg-amber-600 border-amber-500' : 'bg-slate-800/90 hover:bg-slate-700 border-slate-600'}`}
+                            title="Toggle travel routes"
+                        >
+                            <Icons.Navigation />
+                        </button>
+                    </div>
+                    
+                    {/* Legend */}
+                    <div className="absolute bottom-3 left-3 z-20 bg-slate-800/90 border border-slate-600 rounded-lg p-3 text-xs">
+                        <div className="font-semibold text-slate-300 mb-2">Population Scale</div>
+                        <div className="flex items-center gap-2 text-slate-400">
+                            <div className="w-2 h-2 rounded-full bg-slate-400"></div>
+                            <span>&lt; 1M</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-slate-400">
+                            <div className="w-3 h-3 rounded-full bg-slate-400"></div>
+                            <span>1M - 50M</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-slate-400">
+                            <div className="w-4 h-4 rounded-full bg-slate-400"></div>
+                            <span>50M+</span>
+                        </div>
+                        {showRoutes && (
+                            <div className="mt-2 pt-2 border-t border-slate-600 text-amber-400">
+                                <Icons.Navigation /> Routes shown
+                            </div>
+                        )}
+                    </div>
+                    
+                    <svg 
+                        ref={mapRef}
+                        viewBox="0 0 1000 600" 
+                        className="w-full h-[500px]"
+                        style={{ background: 'radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a15 100%)' }}
+                    >
+                        {/* Stars */}
+                        {stars.map((star, i) => (
+                            <circle 
+                                key={i}
+                                cx={star.x}
+                                cy={star.y}
+                                r={star.size}
+                                fill="white"
+                                opacity="0.6"
+                                style={{ animation: `twinkle 3s ease-in-out ${star.delay}s infinite` }}
+                            />
+                        ))}
+                        
+                        {/* Distant nebula effect */}
+                        <defs>
+                            <radialGradient id="nebula1" cx="20%" cy="30%">
+                                <stop offset="0%" stopColor="#4a1a6b" stopOpacity="0.3" />
+                                <stop offset="100%" stopColor="transparent" />
+                            </radialGradient>
+                            <radialGradient id="nebula2" cx="80%" cy="70%">
+                                <stop offset="0%" stopColor="#1a4a6b" stopOpacity="0.2" />
+                                <stop offset="100%" stopColor="transparent" />
+                            </radialGradient>
+                        </defs>
+                        <ellipse cx="200" cy="150" rx="150" ry="100" fill="url(#nebula1)" />
+                        <ellipse cx="800" cy="450" rx="120" ry="80" fill="url(#nebula2)" />
+                        
+                        {/* Orbit paths */}
+                        {locations.filter(([id, loc]) => !loc.isRing && !loc.isSignal).map(([id, loc]) => (
+                            <ellipse 
+                                key={`orbit-${id}`}
+                                cx={centerX}
+                                cy={centerY}
+                                rx={loc.orbitRadius * zoom}
+                                ry={loc.orbitRadius * zoom * 0.4}
+                                className={selectedLocation === id ? "orbit-path-highlight" : "orbit-path"}
+                            />
+                        ))}
+                        
+                        {/* Belt orbit region */}
+                        <ellipse 
+                            cx={centerX}
+                            cy={centerY}
+                            rx={worldData.locations.belt.orbitRadius * zoom - 15}
+                            ry={(worldData.locations.belt.orbitRadius * zoom - 15) * 0.4}
+                            fill="none"
+                            stroke="rgba(139, 115, 85, 0.2)"
+                            strokeWidth={30 * zoom}
+                        />
+                        
+                        {/* Travel routes */}
+                        {showRoutes && (
+                            <g>
+                                {/* Earth-Luna */}
+                                <line 
+                                    x1={getLocationPosition('earth').x} y1={getLocationPosition('earth').y}
+                                    x2={getLocationPosition('luna').x} y2={getLocationPosition('luna').y}
+                                    className="travel-route"
+                                />
+                                {/* Earth-Mars */}
+                                <line 
+                                    x1={getLocationPosition('earth').x} y1={getLocationPosition('earth').y}
+                                    x2={getLocationPosition('mars').x} y2={getLocationPosition('mars').y}
+                                    className="travel-route"
+                                />
+                                {/* Mars-Belt */}
+                                <line 
+                                    x1={getLocationPosition('mars').x} y1={getLocationPosition('mars').y}
+                                    x2={getLocationPosition('belt').x} y2={getLocationPosition('belt').y}
+                                    className="travel-route"
+                                />
+                                {/* Belt-Jupiter */}
+                                <line 
+                                    x1={getLocationPosition('belt').x} y1={getLocationPosition('belt').y}
+                                    x2={getLocationPosition('jupiter').x} y2={getLocationPosition('jupiter').y}
+                                    className="travel-route"
+                                />
+                                {/* Jupiter-Saturn */}
+                                <line 
+                                    x1={getLocationPosition('jupiter').x} y1={getLocationPosition('jupiter').y}
+                                    x2={getLocationPosition('saturn').x} y2={getLocationPosition('saturn').y}
+                                    className="travel-route"
+                                />
+                                {/* Jupiter-Signal (FTL route) */}
+                                <line 
+                                    x1={getLocationPosition('jupiter').x} y1={getLocationPosition('jupiter').y}
+                                    x2={getLocationPosition('signal').x} y2={getLocationPosition('signal').y}
+                                    stroke="#fbbf24"
+                                    strokeWidth="2"
+                                    strokeDasharray="10 5"
+                                    opacity="0.8"
+                                />
+                                <text 
+                                    x={(getLocationPosition('jupiter').x + getLocationPosition('signal').x) / 2}
+                                    y={(getLocationPosition('jupiter').y + getLocationPosition('signal').y) / 2 - 10}
+                                    fill="#fbbf24"
+                                    fontSize="10"
+                                    textAnchor="middle"
+                                >
+                                    22-23 days (FTL)
+                                </text>
+                            </g>
+                        )}
+                        
+                        {/* Sun */}
+                        <defs>
+                            <radialGradient id="sun-gradient" cx="40%" cy="40%">
+                                <stop offset="0%" stopColor="#fff7c0" />
+                                <stop offset="50%" stopColor="#ffcc00" />
+                                <stop offset="100%" stopColor="#ff8c00" />
+                            </radialGradient>
+                            <filter id="sun-glow">
+                                <feGaussianBlur stdDeviation="8" result="blur" />
+                                <feMerge>
+                                    <feMergeNode in="blur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
+                        <circle 
+                            cx={centerX - 60 * zoom} 
+                            cy={centerY} 
+                            r={40 * zoom}
+                            fill="url(#sun-gradient)"
+                            filter="url(#sun-glow)"
+                        />
+                        {/* Sun corona */}
+                        <circle 
+                            cx={centerX - 60 * zoom} 
+                            cy={centerY} 
+                            r={55 * zoom}
+                            fill="none"
+                            stroke="rgba(255, 200, 50, 0.3)"
+                            strokeWidth={10 * zoom}
+                            style={{ filter: 'blur(5px)' }}
+                        />
+                        
+                        {/* Planets */}
+                        {locations.map(([id, loc]) => {
+                            if (loc.isRing) {
+                                return renderPlanet(id, loc, getLocationPosition(id));
+                            }
+                            return null;
+                        })}
+                        {locations.map(([id, loc]) => {
+                            if (!loc.isRing) {
+                                return renderPlanet(id, loc, getLocationPosition(id));
+                            }
+                            return null;
+                        })}
+                        
+                        {/* Labels */}
+                        {locations.filter(([id, loc]) => !loc.isRing).map(([id, loc]) => {
+                            const pos = getLocationPosition(id);
+                            const isSelected = selectedLocation === id;
+                            const offset = loc.size * zoom + 10;
+                            return (
+                                <text 
+                                    key={`label-${id}`}
+                                    x={pos.x}
+                                    y={pos.y + offset + 5}
+                                    textAnchor="middle"
+                                    fill={isSelected ? "#fbbf24" : "#94a3b8"}
+                                    fontSize={isSelected ? "13" : "11"}
+                                    fontWeight={isSelected ? "bold" : "normal"}
+                                    style={{ cursor: 'pointer' }}
+                                    onClick={() => onLocationSelect(id)}
+                                >
+                                    {loc.name}
+                                </text>
+                            );
+                        })}
+                        <text 
+                            x={getLocationPosition('belt').x}
+                            y={getLocationPosition('belt').y}
+                            textAnchor="middle"
+                            fill={selectedLocation === 'belt' ? "#fbbf24" : "#8B7355"}
+                            fontSize="11"
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => onLocationSelect('belt')}
+                        >
+                            Asteroid Belt
+                        </text>
+                        
+                        {/* Hover info */}
+                        {renderHoverInfo()}
+                    </svg>
+                </div>
+            );
+        };
+        
+        // ============ LOCATION DETAIL PANEL ============
+        
+        const LocationDetailPanel = ({ locationId, onClose }) => {
+            const loc = worldData.locations[locationId];
+            if (!loc) return null;
+            
+            return (
+                <div className="bg-slate-800 rounded-lg border border-slate-700 p-4 space-y-4 mt-4">
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <h3 className="text-xl font-bold text-slate-100">{loc.name}</h3>
+                            <p className="text-amber-400">{loc.population}</p>
+                            <p className="text-slate-400 text-sm">{loc.status}</p>
+                        </div>
+                        <button onClick={onClose} className="text-slate-500 hover:text-slate-300 p-1">
+                            <Icons.X />
+                        </button>
+                    </div>
+                    
+                    <p className="text-slate-300 text-sm leading-relaxed">{loc.description}</p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Factions Present */}
+                        <div className="bg-slate-900/50 rounded-lg p-3">
+                            <h4 className="text-sm font-semibold text-slate-400 mb-2">Factions Present</h4>
+                            <div className="flex flex-wrap gap-1">
+                                {loc.factions.map((f, i) => (
+                                    <span key={i} className="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded">
+                                        {f}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                        
+                        {/* Key Facilities */}
+                        <div className="bg-slate-900/50 rounded-lg p-3">
+                            <h4 className="text-sm font-semibold text-slate-400 mb-2">Key Facilities</h4>
+                            <ul className="text-xs text-slate-300 space-y-1">
+                                {loc.facilities.map((f, i) => (
+                                    <li key={i}>• {f}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    {/* Travel Times */}
+                    <div className="bg-slate-900/50 rounded-lg p-3">
+                        <h4 className="text-sm font-semibold text-slate-400 mb-2">Travel Times (Conventional)</h4>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+                            {Object.entries(loc.travelTimes).map(([dest, time]) => (
+                                <div key={dest} className="flex justify-between bg-slate-800 px-2 py-1 rounded">
+                                    <span className="text-slate-400 capitalize">{dest}:</span>
+                                    <span className="text-amber-400">{time}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // ============ OTHER COMPONENTS ============
 
         const CodexIcon = ({ name, className }) => {
             const iconMap = { Shield: Icons.Shield, Zap: Icons.Zap, Radio: Icons.Radio, Rocket: Icons.Rocket, Users: Icons.Users, Globe: Icons.Globe, Book: Icons.Book };
@@ -524,27 +1171,6 @@ Their children sometimes visit Taiwan as tourists, speaking Mandarin with foreig
                 <span className="hidden sm:inline">{label}</span>
             </button>
         );
-
-        const SolarSystemMap = ({ onLocationSelect, selectedLocation }) => {
-            const locations = Object.entries(worldData.locations);
-            return (
-                <div className="relative w-full h-96 bg-slate-900 rounded-lg overflow-hidden border border-slate-700">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-gradient-to-br from-yellow-300 to-orange-500 shadow-lg shadow-yellow-500/50" />
-                    <svg className="absolute inset-0 w-full h-full">
-                        {[120, 160, 210, 280, 360, 450].map((r, i) => (
-                            <ellipse key={i} cx="40" cy="50%" rx={r} ry={r * 0.4} fill="none" stroke="#334155" strokeWidth="1" strokeDasharray="4 4" />
-                        ))}
-                    </svg>
-                    {locations.map(([id, loc]) => (
-                        <button key={id} onClick={() => onLocationSelect(id)} className={`absolute transform -translate-x-1/2 -translate-y-1/2 transition-all group ${selectedLocation === id ? 'scale-125 z-10' : 'hover:scale-110'}`} style={{ left: `${loc.coordinates.x}%`, top: `${loc.coordinates.y}%` }}>
-                            <div className={`w-4 h-4 rounded-full border-2 ${selectedLocation === id ? 'border-amber-400' : 'border-slate-500'}`} style={{ backgroundColor: loc.color }} />
-                            <span className={`absolute left-6 top-1/2 -translate-y-1/2 text-xs whitespace-nowrap ${selectedLocation === id ? 'text-amber-400' : 'text-slate-400 group-hover:text-slate-200'}`}>{loc.name}</span>
-                        </button>
-                    ))}
-                    <div className="absolute bottom-2 right-2 text-xs text-slate-500">Click a location for details</div>
-                </div>
-            );
-        };
 
         const Timeline = ({ onEventSelect }) => {
             const categoryColors = { era: 'bg-slate-600', crisis: 'bg-red-600', political: 'bg-blue-600', expansion: 'bg-green-600', war: 'bg-red-800', military: 'bg-indigo-600', technology: 'bg-purple-600', mystery: 'bg-slate-500', signal: 'bg-amber-600', mission: 'bg-amber-500' };
@@ -641,9 +1267,20 @@ Their children sometimes visit Taiwan as tourists, speaking Mandarin with foreig
                     case 'map':
                         return (
                             <div className="space-y-4">
-                                <h2 className="text-xl font-semibold text-slate-100">Solar System</h2>
-                                <SolarSystemMap onLocationSelect={setSelectedLocation} selectedLocation={selectedLocation} />
-                                {selectedLocation && <DetailPanel type="location" data={worldData.locations[selectedLocation]} onClose={() => setSelectedLocation(null)} />}
+                                <div className="flex items-center justify-between">
+                                    <h2 className="text-xl font-semibold text-slate-100">Solar System — 2226</h2>
+                                    <p className="text-slate-500 text-sm">Click planets for details • Toggle routes • Zoom in/out</p>
+                                </div>
+                                <EnhancedSolarSystemMap 
+                                    onLocationSelect={setSelectedLocation}
+                                    selectedLocation={selectedLocation}
+                                />
+                                {selectedLocation && (
+                                    <LocationDetailPanel
+                                        locationId={selectedLocation}
+                                        onClose={() => setSelectedLocation(null)}
+                                    />
+                                )}
                             </div>
                         );
                     case 'timeline':
