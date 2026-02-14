@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Longwatch Chronicles - World Bible</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+        body { background: #0f172a; }
+        .prose-custom h3 { color: #fbbf24; font-size: 1.125rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem; }
+        .prose-custom p { margin-bottom: 0.5rem; }
+        .prose-custom .quote { font-style: italic; color: rgba(251, 191, 36, 0.8); padding-left: 1rem; border-left: 2px solid #d97706; margin: 1rem 0; }
+        .prose-custom .mono { font-family: monospace; font-size: 0.75rem; color: #94a3b8; background: rgba(30, 41, 59, 0.5); padding: 0.25rem 0.5rem; border-radius: 0.25rem; }
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+
+        // ============ ICONS ============
+        const Icons = {
+            Search: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>,
+            MapPin: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>,
+            Clock: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>,
+            Book: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>,
+            Users: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>,
+            ChevronRight: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>,
+            ArrowLeft: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>,
+            Shield: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>,
+            Zap: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>,
+            Radio: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"></path></svg>,
+            Rocket: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path></svg>,
+            Globe: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>,
+            X: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        };
+
+        // ============ DATA ============
+        const worldData = {
+            timeline: [
+                { year: "2025-2040", title: "Climate Reckoning", description: "Earth's climate crisis reaches critical points, paradoxically driving international cooperation as nations recognize shared threats.", category: "era" },
+                { year: "2031-2034", title: "Semiconductor Crisis", description: "Global chip shortage cascades into systemic failure, revealing how fragile interconnected economies had become. No nation could produce anything complex within its own borders.", category: "crisis" },
+                { year: "2038", title: "Taiwan Strait Crisis", description: "China executes a decapitation strike against Taiwan. The US Seventh Fleet holds position but does not engage. Taiwan falls within 24 hours. Two million flee into exile. American credibility in Asia is shattered.", category: "crisis" },
+                { year: "2041-2055", title: "Second Space Race", description: "Sino-Russian partnership launches aggressive Lunar development. Competitive response from US and European powers accelerates space settlement.", category: "era" },
+                { year: "2047", title: "Moon Treaty", description: "Establishes basic principles for lunar settlement: no territorial sovereignty, resource extraction rights based on first-exploitation, mandatory sharing of life-support technologies.", category: "political" },
+                { year: "2052", title: "First Mars Settlement", description: "Mariner Station established by American-European-Japanese consortium. Humanity becomes a multi-planet species.", category: "expansion" },
+                { year: "2052", title: "Treaty of Vladivostok", description: "Formalizes Sino-Russian integration: single economic zone, coordinated foreign policy, integrated military command, shared space operations.", category: "political" },
+                { year: "2076", title: "Luna Accord", description: "Federal Space Government established. All military spacecraft placed under unified Federal authority. The minimum framework necessary to prevent space from becoming a battlefield.", category: "political" },
+                { year: "2089", title: "Korean Reunification", description: "North Korean regime bought out through negotiated settlement. Kim family granted immunity and exile. Reunification proceeds through careful 15-year integration.", category: "political" },
+                { year: "2137", title: "Olympus Mons Incident", description: "Martian civic groups seize terraforming infrastructure demanding independence. Federal forces back down. Mars gains internal self-governance while remaining in Federal framework.", category: "crisis" },
+                { year: "2156", title: "AI Crisis", description: "Experimental corporate AI exceeds parameters, kills 43 people. Leads to strict AGI prohibition that remains in effect.", category: "crisis" },
+                { year: "2180s", title: "Saturn Goes Dark", description: "Federal presence collapses at Saturn. The outer system becomes effectively lawless—corporate fiefdoms, criminal enterprises, religious separatists.", category: "era" },
+                { year: "2189", title: "Belt War", description: "Corporate fleets from Ceres-Pallas and Vanguard exchange fire over disputed mining claims. Three weeks of combat. Federal intervention comes too late to prevent the message: corporate power can challenge Federal authority.", category: "war" },
+                { year: "2189", title: "Kepler Mutiny", description: "Captain Elena Vandenberg refuses orders to support corporate interests along bloc lines. Her entire crew chooses court martial over complicity. 'We serve humanity. We serve no bloc.'", category: "military" },
+                { year: "2190", title: "Longwatch Founded", description: "Vandenberg given mandate to create something new. A small force, separate from regular fleet, with one mission: go where politics cannot follow. First class graduates 2191.", category: "military" },
+                { year: "2198", title: "Callisto Rescue", description: "Longwatch Captain Yuki Tanaka defies quarantine orders to save 127 lives at infected research station. Censured by Fleet Command, decorated by Council.", category: "military" },
+                { year: "2211", title: "The Silent Year", description: "Longwatch vessel Amundsen vanishes for 11 months during trans-Neptunian survey. Returns with classified data. Crew reassigned to Luna, decline all interviews.", category: "mystery" },
+                { year: "2214", title: "Vandenberg Dies", description: "Longwatch founder Elena Vandenberg dies on deep patrol. Vandenberg Hall on Luna named in her honor.", category: "military" },
+                { year: "2219", title: "Titan Standoff", description: "Longwatch vessel Shackleton faces down three Han-Lockheed cruisers at Saturn. Commander Park records everything. Han-Lockheed security leadership changes three months later.", category: "military" },
+                { year: "2223", title: "FTL Breakthrough", description: "Dr. Sarah Okonkwo's team at Ganymede accidentally creates stable warp bubble while working on exotic matter for radiation shielding. They barely understand why it worked. Federal government immediately classifies everything.", category: "technology" },
+                { year: "2224", title: "Prometheus Commissioned", description: "Humanity's first and only FTL-capable vessel enters service. A second ship, Magellan, begins construction—won't be ready until 2227-2228.", category: "technology" },
+                { year: "Sept 2225", title: "The Signal Detected", description: "Deep Space Monitoring Array Epsilon-7 detects artificial transmission from 45-50 light-years distant. Mathematical patterns on the hydrogen line. We're eavesdropping on someone else's conversation.", category: "signal" },
+                { year: "Jan 15, 2226", title: "Mission Launch", description: "UEFS Prometheus departs Ganymede orbit. First crewed interstellar voyage. 180 crew. No communication possible until return. You are the captain.", category: "mission" }
+            ],
+            
+            locations: {
+                earth: { name: "Earth", type: "planet", population: "11.2 billion", status: "Divided among five major blocs", description: "Humanity's homeworld remains divided among the great blocs, but united through the Federal Space Government for extraterrestrial affairs. The consolidation of the mid-21st century—driven by the semiconductor crisis and the logic of economic interdependence—produced the political structure that still governs.", coordinates: { x: 50, y: 50 }, color: "#4A90D9" },
+                luna: { name: "Luna", type: "moon", population: "62 million", status: "Federal administered, Earth bloc territories", description: "Humanity's second home and the closest thing to a post-national society. Five generations have created a distinct Lunar identity. Pragmatic, surveillance-accepting, gravity-adapted. Major settlements: New Armstrong (12M), Tsiolkovsky (8M), Europa Station (6M). Gateway L5 serves as the logistics hub for the entire system.", coordinates: { x: 55, y: 48 }, color: "#C0C0C0" },
+                mars: { name: "Mars", type: "planet", population: "47 million", status: "Autonomous governance within Federal framework", description: "The great project. A world being terraformed over centuries. Atmosphere thickening, temperatures rising, engineered organisms spreading. Martians think in generations. The Autonomist movement grows—resentment of Earth governance, demands for independence. Major settlements: Mariner Station (8M), Zhurong Base (5M), Hellas Basin Collective (4M), Olympus City (3M).", coordinates: { x: 62, y: 45 }, color: "#CD5C5C" },
+                venus: { name: "Venus", type: "planet", population: "180,000 (orbital)", status: "Federal administered, Pan-European dominated", description: "Hell below, heaven above. Surface temperature melts lead; orbital stations house humanity's elite engineers. The Cytherean Families—three generations born in Venus orbit—have become a distinct culture. Proud, insular, technically peerless. They've threatened mass resignation three times over policy disputes. Three times, the Federation capitulated.", coordinates: { x: 42, y: 52 }, color: "#DEB887" },
+                belt: { name: "Asteroid Belt", type: "region", population: "~8 million", status: "Federal jurisdiction, corporate dominated", description: "The law ends here. Pragmatism rules. Ceres (2.3M) is the closest thing to civilization—actual governance, actual services. Vesta (400K) is industrial hell, Sino-Russian corporations optimizing for output. Beyond that: countless smaller operations, independent prospectors, and people who need to disappear. Violence is common. Help is rare.", coordinates: { x: 70, y: 50 }, color: "#8B7355" },
+                jupiter: { name: "Jupiter System", type: "system", population: "320,000", status: "Federal jurisdiction (barely), frontier", description: "The frontier. Where Federal authority frays. Ganymede Station (180K) serves as Longwatch HQ and site of the FTL breakthrough. Europa hosts researchers studying the subsurface ocean—possible alien life beneath the ice. Callisto processes resources. This is where civilization ends and the unknown begins.", coordinates: { x: 78, y: 48 }, color: "#DAA520" },
+                saturn: { name: "Saturn & Beyond", type: "system", population: "50-100,000 (estimated)", status: "Effectively lawless", description: "Beyond Jupiter, Federal authority is a polite fiction. New Shanghai on Titan: Han-Lockheed's corporate city-state where laws don't reach. The ring settlements: miners, religious communities, pirates, refugees. No one knows the real population because many prefer not to be counted. This is where you go to disappear.", coordinates: { x: 88, y: 52 }, color: "#F4A460" }
+            },
+            
+            factions: {
+                blocs: [
+                    { id: "sphere", name: "Sino-Russian Sphere", type: "bloc", population: "2.8 billion", philosophy: "Directed harmony—sophisticated authoritarianism with technocratic efficiency", description: "The largest political entity in human history. Born from China's economic might and Russia's resources after the Taiwan crisis shattered the old order. Surveillance pervasive, planning long-term, human costs acceptable if output justifies them. The Ceres-Pallas Consortium operates as their arm in the Belt.", color: "#DC143C" },
+                    { id: "federation", name: "Pan-European Federation", type: "bloc", population: "980 million", philosophy: "Baroque democracy—complex, slow, legitimate", description: "The most complicated political system in human history. Parliament, Commission, Council, Court—power distributed because no one trusts anyone else with concentration. Decision-making agonizingly slow, but the legitimacy is real. Dominates Venus operations, leads in precision engineering and sustainability.", color: "#4169E1" },
+                    { id: "alliance", name: "Western Hemisphere Alliance", type: "bloc", population: "1.9 billion", philosophy: "American capitalism at continental scale", description: "The United States extended until the extension became invisible. Entrepreneurial, market-driven, unequal. Dominates Mars development—over half of Martian population in Alliance settlements. Now facing the Autonomist movement: Mars wants independence, and the Alliance refuses to discuss it.", color: "#228B22" },
+                    { id: "union", name: "African Union", type: "bloc", population: "3.2 billion", philosophy: "Patient federation—built from inside out", description: "The youngest bloc, built deliberately rather than by crisis. Demographic advantage: youngest population, growing workforce. Economic disadvantage: still developing infrastructure. Space presence modest but growing. BioFrontier Corporation represents their greatest contribution—life support and agricultural systems used throughout the solar system.", color: "#FFD700" },
+                    { id: "aligned", name: "Aligned Democratic States", type: "coalition", population: "~600 million", philosophy: "Coordination without integration", description: "Japan, Korea, Australia, and others. Not a formal bloc—they refused absorption—but coordinated closely enough that the distinction sometimes seems academic. Korean reunification (2089) produced a technological powerhouse. Japanese influence flows through components everyone needs. They prefer to be indispensable rather than dominant.", color: "#9370DB" }
+                ],
+                corps: [
+                    { id: "hanlockheed", name: "Han-Lockheed Orbital", type: "megacorp", revenue: "$890B", employees: "2.4 million", business: "Spacecraft construction, advanced propulsion", description: "The largest corporation in human civilization. Builds everything from shuttles to warships. Operates New Shanghai on Titan—corporate city-state beyond Federal law. Desperately wants FTL technology. Almost certainly has agents among the Prometheus corporate observers.", color: "#B22222", threat: "high" },
+                    { id: "cerespallas", name: "Ceres-Pallas Consortium", type: "megacorp", revenue: "$670B", employees: "1.8 million", business: "Asteroid mining, resource extraction", description: "Sino-Russian backed, 30% of Belt production. Notorious for brutal efficiency—longer shifts, thinner margins, debt bondage that functions as indentured servitude. Started the Belt War in 2189. The Kepler Mutiny happened because Captain Vandenberg refused to support them.", color: "#8B0000", threat: "medium" },
+                    { id: "atmostech", name: "AtmoTech Industries", type: "megacorp", revenue: "$420B", employees: "890,000", business: "Terraforming, atmospheric processing", description: "European, essential to Mars transformation. The planet cannot continue terraforming without AtmoTech systems. This dependency gives them unique leverage. Engineers who regard their work as sacred—transforming worlds is not a job, it's a calling.", color: "#4682B4", threat: "low" },
+                    { id: "vanguard", name: "Vanguard Mining Group", type: "megacorp", revenue: "$380B", employees: "950,000", business: "Rare earths, platinum group metals", description: "The 'good' megacorp—or the one with the best reputation. Western Alliance origin. Better wages, shorter shifts, actual benefits. Still a megacorp focused on extraction and profit, but 'better than Ceres-Pallas' means something to workers who have to choose.", color: "#2E8B57", threat: "low" },
+                    { id: "biofrontier", name: "BioFrontier Corporation", type: "megacorp", revenue: "$310B", employees: "680,000", business: "Biotech, agricultural systems, medical technology", description: "African Union origin, now solar-system-wide. Expertise in adapting biological systems to harsh environments—developed through decades of work on African challenges. Their life support and agricultural modules are now standard everywhere. Practical, reliable, unglamorous, essential.", color: "#32CD32", threat: "low" },
+                    { id: "solbank", name: "SolBank Consortium", type: "megacorp", revenue: "$290B", employees: "450,000", business: "Banking, finance, insurance", description: "Not a company but a consortium of Earth's largest financial institutions. Controls solar-system-wide financial infrastructure. Bloodless, calculating, neutral. Can destroy any enterprise by denying services, but must maintain neutrality to remain useful to everyone.", color: "#696969", threat: "low" }
+                ],
+                orgs: [
+                    { id: "federal", name: "Federal Space Government", type: "government", description: "Supranational authority for extraterrestrial space. Controls all military spacecraft, licenses resource extraction, manages space traffic. Authority absolute in inner system, degrades with distance. At Saturn, essentially theoretical. Secretary-General: Elena Vasquez.", color: "#000080" },
+                    { id: "longwatch", name: "Longwatch", type: "military", description: "The elite within the elite. Founded after the Kepler Mutiny by Captain Elena Vandenberg. 3,200 personnel, 12 ships. 85% washout rate. Genuinely post-national—the only organization where bloc identity truly doesn't matter. They carry humanity into the dark and bring it home again.", color: "#191970" },
+                    { id: "uef", name: "United Earth Fleet", type: "military", description: "Federal military arm. 60-80 vessels, mostly patrol craft. Officially unified, but bloc character persists underneath—everyone knows which ships are 'really' Chinese, American, European. If the system cracked, everyone knows how the fleet would split.", color: "#2F4F4F" }
+                ]
+            },
+            
+            codex: {
+                longwatch: {
+                    title: "Longwatch",
+                    category: "Organizations",
+                    icon: "Shield",
+                    content: `The elite within the elite—Federal Space Government's exploration and first contact service.
+
+<b>Founded:</b> March 15, 2190
+<b>Personnel:</b> 3,200 officers and crew
+<b>Vessels:</b> 12 (only Prometheus has FTL)
+<b>Headquarters:</b> Ganymede Station
+<b>Commander:</b> Rear Admiral Ekaterina Vasquez-Okonjo
+
+<h3>Origins: The Kepler Mutiny</h3>
+
+Longwatch began during the Belt War of 2189. Captain Elena Vandenberg of the Federal cruiser Kepler received orders to support Vanguard Mining—not because they were right, but because Western Alliance interests aligned with theirs.
+
+Vandenberg refused. "Federal vessels do not serve bloc interests. We will protect civilian installations. We will not take sides in corporate conflict."
+
+Fleet Command relieved her. Her XO was ordered to comply. He refused too. Then the weapons officer. Then the navigator. One by one, the entire crew chose court martial over complicity.
+
+<div class="quote">"We serve humanity. We serve no bloc."</div>
+
+The compromise: charges dropped, but Vandenberg would never command a regular vessel again. Instead, the Council gave her something new to build.
+
+<h3>Selection: Breaking and Remaking</h3>
+
+<b>The Numbers:</b>
+• ~2,000 applications per year
+• ~400 accepted to Academy
+• ~60 graduate
+• 85% washout rate
+
+<b>Phase One (Months 1-4):</b> The Stripping. No national flags, no bloc insignia, teams assembled to maximize cultural friction. The academics are brutal. The psych evaluations break people—finding loyalties you're hiding from yourself.
+
+<b>Phase Two (Months 5-12):</b> The Crucible. Eight months on a training vessel. Real patrols, real emergencies, real isolation. You don't know which emergencies are drills. The ones who make it aren't the toughest—they're the ones who reach for crewmates instead of countrymen.
+
+<b>Phase Three (Months 13-18):</b> The Oath. Vandenberg Hall, Luna. Black walls, stars through the viewport.
+
+<div class="quote">"I am Longwatch. I serve no nation, no bloc, no tribe. I carry humanity into the dark, and I will bring it home again."</div>
+
+<h3>Traditions</h3>
+
+<b>The Symbol:</b> Circle containing a single point—a star from great distance. No colors. Worn as collar pin.
+
+<b>The Three Silences:</b> Where you're from, who you voted for, what god you pray to. Not forbidden—but speaking of them marks you as uncommitted.
+
+<b>The Long Table:</b> Every vessel has one mess table. All ranks eat together. Captain next to ensign.
+
+<b>Heritage Hours:</b> Four hours weekly for native languages and cultural practices. The point isn't suppression—it's compartmentalization.
+
+<h3>The Fleet</h3>
+
+<div class="mono">Prometheus | Prometheus-class | Only FTL vessel
+Ibn Battuta | Explorer-class | Saturn patrol
+Shackleton | Explorer-class | Jupiter system
+Amundsen | Explorer-class | Training duties
+Zheng He | Explorer-class | Belt operations
++ 7 more | Explorer-class | Various</div>
+
+The Magellan—second Prometheus-class—is under construction. Two years from completion.`
+                },
+                ftl: {
+                    title: "FTL Technology",
+                    category: "Technology",
+                    icon: "Zap",
+                    content: `The crown jewel of human achievement. The Federal Government's most closely guarded secret.
+
+<h3>The Breakthrough (2223)</h3>
+
+Dr. Sarah Okonkwo's team at Ganymede Research Station was working on exotic matter for radiation shielding. An unexpected quantum fluctuation created a microscopic stable warp bubble for 0.3 seconds.
+
+<b>They barely understand why it worked.</b>
+
+They can reproduce it, but the theory is incomplete. The Federal government immediately classified everything. Dr. Okonkwo's team remains under permanent security protocols.
+
+<h3>How It Works</h3>
+
+Alcubierre-variant warp drive. The ship doesn't move faster than light—spacetime contracts ahead and expands behind, carrying the bubble forward.
+
+<b>Requirements:</b>
+• Massive energy (dedicated antimatter reactor)
+• Exotic matter (negative energy density field generators)
+• Precise quantum configuration (THE secret)
+
+<h3>Specifications</h3>
+
+<div class="mono">Speed: ~2 light-years per subjective day
+Range: ~25 light-years before instability
+Cooldown: 48+ hours between jumps
+Course changes: None once bubble forms
+Signal distance: ~45-50 light-years
+Transit time: 22-23 days each way</div>
+
+<h3>Jump Options</h3>
+
+The drive can theoretically sustain a bubble indefinitely. But it's never been tested beyond a few days.
+
+<b>Option A - One Sustained Jump:</b>
+• 23 days straight in the bubble
+• More fuel-efficient
+• Completely unproven at this duration
+• If something fails mid-transit, no way to stop
+
+<b>Option B - Multiple Short Jumps:</b>
+• Jump a few light-years, drop out, cooldown, repeat
+• Takes longer, burns more fuel
+• Can check systems between jumps
+• Safer but tighter margins
+
+Both approaches are unproven at interstellar distances. The crew must choose.
+
+<h3>Precision and Emergence</h3>
+
+The bubble can collapse intentionally at any point. BUT precision degrades with distance. At 5 light-years, you target a region. At 45 light-years, you're aiming at a general area.
+
+Emerging too close to a gravity well is catastrophic. You drop out at safe distance and approach on conventional drives.
+
+<h3>Failure Scenarios</h3>
+
+If the drive fails mid-transit: bubble collapses, you drop into normal space. In interstellar void, the nearest star is light-years away. Fusion drives at 0.3g take decades.
+
+If fixable, you can attempt re-jump. If not, you're stranded.
+
+<h3>Corporate Espionage</h3>
+
+Corporations KNOW FTL exists. They know it involves exotic matter and warp fields. They DON'T know the quantum configuration.
+
+Han-Lockheed is desperate to crack it. At least one corporate observer on Prometheus has secondary objectives.`
+                },
+                signal: {
+                    title: "The Signal",
+                    category: "Mission",
+                    icon: "Radio",
+                    content: `The reason for everything.
+
+<h3>Discovery</h3>
+
+<b>Date:</b> September 15, 2225
+<b>Detection:</b> Deep Space Monitoring Array Epsilon-7 (outer Belt)
+<b>Time:</b> 0342 UTC
+
+Automated systems detected anomalous radio emission from beyond the solar system. Initial assumption: equipment malfunction. Cross-check confirmed: the signal was real, external, and artificial.
+
+<h3>Characteristics</h3>
+
+<div class="mono">Origin: ~45-50 light-years distant
+Direction: Toward Tau Ceti (offset 15°—NOT from Tau Ceti)
+Frequency: 1420 MHz (hydrogen line)
+Pattern: Mathematical sequences: primes, then complex concepts
+Nature: Directed transmission spillover
+Duration: Continuous since detection</div>
+
+<h3>The Key Insight</h3>
+
+<b>The signal isn't meant for us.</b>
+
+We're detecting spillover from a targeted transmission. Like overhearing a conversation in another room. Like radio waves that leaked past Earth during our broadcast era.
+
+Someone is talking to someone else. We're eavesdropping.
+
+<h3>What It Proves</h3>
+
+• We are not alone
+• Someone is transmitting
+• They use mathematics and the hydrogen line (universal concepts)
+• They have technology at least comparable to ours
+
+<h3>What We Don't Know</h3>
+
+• What is sending it?
+• Is the source still active, or ancient echoes?
+• Is it a beacon? A warning? Routine communication?
+• Do they know we exist?
+• <b>Do they know we're coming?</b>
+
+<h3>The Decision</h3>
+
+Federal Council vote: 13-2 to authorize mission.
+
+The minority's concerns were not trivial. Some argued humanity should wait, study remotely, develop better FTL. Others argued first contact was too important to delay—whoever makes contact first shapes the relationship forever.
+
+The debate continues. The mission proceeds anyway.`
+                },
+                prometheus: {
+                    title: "UEFS Prometheus",
+                    category: "Mission",
+                    icon: "Rocket",
+                    content: `Named for the Titan who brought fire to humanity—with all the implications that carries.
+
+<h3>Overview</h3>
+
+Humanity's first and only FTL-capable vessel. Simultaneously flagship and prototype. If lost, humanity's FTL capability is gone for years.
+
+<h3>Specifications</h3>
+
+<div class="mono">Registry: UEFS-LC-003
+Class: Prometheus-class (only one exists)
+Commissioned: July 2224
+Length: 450 meters
+Beam: 85 meters
+Mass: 180,000 tonnes
+Crew: 180 (capacity 250)</div>
+
+<h3>Propulsion</h3>
+
+<b>FTL:</b> Alcubierre-variant warp drive
+• ~2 light-years/day
+• 48+ hour cooldown
+
+<b>Conventional:</b> Fusion torch
+• 0.3g sustained acceleration
+
+<h3>Armament</h3>
+
+Defensive posture:
+• 4 railgun batteries
+• 20 missile tubes
+• Point-defense laser grid
+• Electronic warfare suite
+
+<h3>Facilities</h3>
+
+• Xenobiology lab (biosafety level 4)
+• Astrometrics and sensors
+• Physics laboratory
+• Chemistry/materials science
+• Linguistics/cultural analysis
+• Full medical bay with biocontainment
+
+<h3>Support Craft</h3>
+
+• 4 short-range shuttles
+• 2 long-range explorer craft
+• 20 EVA pods
+
+<h3>Endurance</h3>
+
+• 5 years independent operation
+• Hydroponics supplements stored food
+• Advanced 3D printing and manufacturing
+• Full repair capability
+
+<h3>Crew Breakdown</h3>
+
+<div class="mono">Command: 12
+Science: 45
+Engineering: 35
+Medical: 8
+Marines: 20
+Support: 40
+Corporate Observers: 5</div>
+
+<h3>The Name</h3>
+
+Prometheus stole fire from the gods and gave it to humanity. He suffered for it.
+
+The crew knows the mythology. They know how his story ended.
+
+<h3>Sister Ship</h3>
+
+UEFS Magellan under construction at Ganymede. Two years from completion.
+
+Until then, Prometheus is alone.`
+                },
+                observers: {
+                    title: "Corporate Observers",
+                    category: "Mission",
+                    icon: "Users",
+                    content: `Five corporate representatives aboard Prometheus. Officially scientific specialists. In reality: complicated.
+
+<h3>The Political Reality</h3>
+
+When the Federal Council approved the mission, multiple corporations demanded representation. Han-Lockheed, Ceres-Pallas, AtmoTech, others. Each argued they had scientific expertise to contribute.
+
+Saying no to all was politically impossible. Saying yes to one but not another would cause uproar.
+
+<b>Result:</b> Five slots, distributed across major corporate interests.
+
+<h3>The Complication</h3>
+
+The corporations are <b>rivals</b>. Han-Lockheed and Ceres-Pallas aren't coordinating—they're competing. Their observers may be watching each other as much as the FTL drive.
+
+<h3>The Realistic Breakdown</h3>
+
+<div class="mono">Genuine Scientists: 1-2 (No secret orders. Just doing their job.)
+Passive Intel: 1-2 ("Report what you learn. Don't take risks.")
+Active Threat: 1 (Espionage mission. Willing to act.)</div>
+
+<h3>What You Know</h3>
+
+• Five corporate observers are aboard
+• Longwatch vetted them—real credentials
+• Everyone assumes at least one has secondary objectives
+• You don't know which one
+• You don't know how far they'll go
+
+<h3>What They Want</h3>
+
+FTL technology. The corporation that cracks it—or steals it—gains incalculable advantage.
+
+Han-Lockheed builds spacecraft. FTL-capable ships would be the ultimate product.
+
+At least one observer is gathering intelligence on the drive systems. The Federal security services know this. The observers know they're being watched.
+
+The game plays out 45 light-years from anyone who could intervene.
+
+<h3>Specific Identities</h3>
+
+<b>TBD</b> — To be developed during play.`
+                },
+                beltwar: {
+                    title: "The Belt War (2189)",
+                    category: "History",
+                    icon: "Zap",
+                    content: `Three weeks that changed everything.
+
+<h3>The Cause</h3>
+
+A dispute over mining claims in the Belt between Ceres-Pallas Consortium and Vanguard Mining Group. Both had invested heavily in the same asteroid field. Neither would yield.
+
+Corporate lawyers failed. Corporate negotiators failed. Corporate security did not.
+
+<h3>The Fighting</h3>
+
+What began as armed standoff escalated into actual combat between corporate fleets. Ships were destroyed. Stations were damaged. Perhaps two thousand people died—mostly workers caught in crossfire.
+
+The fighting spread across multiple claim sites as each side reinforced positions and launched reprisals.
+
+<h3>Federal Response</h3>
+
+Federal forces were spread thin. The closest significant naval presence was weeks away. By the time Federal ships arrived in force, the fighting had largely exhausted itself.
+
+The intervention restored order but revealed an uncomfortable truth: <b>corporate military capabilities could challenge Federal authority</b>, and the Federal Government lacked resources to police the entire solar system.
+
+<h3>The Kepler Mutiny</h3>
+
+During the conflict, the Federal cruiser Kepler under Captain Elena Vandenberg received orders to support Vanguard—not because Vanguard was right, but because Western Alliance bloc interests aligned with theirs.
+
+Vandenberg refused. Her entire crew chose court martial over complicity.
+
+<div class="quote">"Federal vessels do not serve bloc interests."</div>
+
+<h3>Aftermath</h3>
+
+<b>Reforms:</b> Corporate security forces nominally limited to "defensive" capabilities. Federal military presence in outer system increased.
+
+<b>Reality:</b> Little changed. "Defensive" proved elastic. Budget constraints kept Federal increases marginal.
+
+<b>Legacy:</b> The Belt War proved corporations could fight the Federal Government to a standstill. The Kepler Mutiny led to Longwatch's founding—an organization that would serve humanity, not blocs or corporations.`
+                },
+                taiwan: {
+                    title: "Taiwan Strait Crisis (2038)",
+                    category: "History",
+                    icon: "Globe",
+                    content: `The night that changed the world.
+
+<h3>The Prelude</h3>
+
+By 2038, Taiwan was the chokepoint of global chip supply—its foundries produced the majority of advanced semiconductors. For Beijing, this dependency was intolerable. For Taipei, it was their only protection. For Washington, it was a commitment they'd maintained for decades without ever deciding what it meant.
+
+<h3>The Strike</h3>
+
+September 15, 2038. Not the amphibious assault that war planners anticipated—something subtler.
+
+Chinese special forces, inserted over preceding weeks through civilian cover, launched coordinated attacks on Taiwan's command infrastructure. Cyberattacks disabled communications and power. By dawn, Taipei was in chaos and President Tsai Ming-hui was dead.
+
+<h3>The American Response</h3>
+
+Admiral Morrison of the Seventh Fleet faced the decision his career had prepared him for. But the situation wasn't what the plans anticipated.
+
+This wasn't a conventional invasion contestable at sea—the critical damage was already done. Chinese forces had established defensive positions but hadn't attacked American assets. Beijing's message was explicit: <b>intervention means general war</b>.
+
+The fleet held position. No American forces engaged.
+
+By nightfall, organized resistance had collapsed.
+
+<h3>The Aftermath</h3>
+
+<b>Taiwan:</b> Two million fled into exile. The occupation was harsh initially, then evolved into sophisticated integration—economic benefits combined with political suppression.
+
+<b>America:</b> Credibility in Asia shattered. Allies concluded they couldn't rely on American protection. Japan and South Korea began their own nuclear programs within the decade.
+
+<b>China:</b> Emboldened. The Sino-Russian partnership accelerated toward full integration.
+
+<h3>The Debate</h3>
+
+Was Morrison right?
+
+<b>Critics:</b> American credibility was destroyed. Allies were abandoned. Authoritarians were emboldened.
+
+<b>Defenders:</b> Intervention might have meant nuclear war. Taiwan was already lost. The critics are volunteering other people's children for uncertain outcomes.
+
+Both arguments contain truth. The question has no answer.
+
+<h3>The Diaspora</h3>
+
+The government-in-exile operates from Los Angeles. They maintain archives, publish alternative histories, wait for restoration that most privately know will never come.
+
+Their children sometimes visit Taiwan as tourists, speaking Mandarin with foreign accents, looking for a homeland that exists only in memory.`
+                }
+            }
+        };
+
+        // ============ COMPONENTS ============
+
+        const CodexIcon = ({ name, className }) => {
+            const iconMap = { Shield: Icons.Shield, Zap: Icons.Zap, Radio: Icons.Radio, Rocket: Icons.Rocket, Users: Icons.Users, Globe: Icons.Globe, Book: Icons.Book };
+            const Icon = iconMap[name] || Icons.Book;
+            return <span className={className}><Icon /></span>;
+        };
+
+        const TabButton = ({ active, onClick, icon: Icon, label }) => (
+            <button onClick={onClick} className={`flex items-center gap-2 px-4 py-3 font-medium transition-all ${active ? 'bg-slate-800 text-amber-400 border-b-2 border-amber-400' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
+                <Icon />
+                <span className="hidden sm:inline">{label}</span>
+            </button>
+        );
+
+        const SolarSystemMap = ({ onLocationSelect, selectedLocation }) => {
+            const locations = Object.entries(worldData.locations);
+            return (
+                <div className="relative w-full h-96 bg-slate-900 rounded-lg overflow-hidden border border-slate-700">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-gradient-to-br from-yellow-300 to-orange-500 shadow-lg shadow-yellow-500/50" />
+                    <svg className="absolute inset-0 w-full h-full">
+                        {[120, 160, 210, 280, 360, 450].map((r, i) => (
+                            <ellipse key={i} cx="40" cy="50%" rx={r} ry={r * 0.4} fill="none" stroke="#334155" strokeWidth="1" strokeDasharray="4 4" />
+                        ))}
+                    </svg>
+                    {locations.map(([id, loc]) => (
+                        <button key={id} onClick={() => onLocationSelect(id)} className={`absolute transform -translate-x-1/2 -translate-y-1/2 transition-all group ${selectedLocation === id ? 'scale-125 z-10' : 'hover:scale-110'}`} style={{ left: `${loc.coordinates.x}%`, top: `${loc.coordinates.y}%` }}>
+                            <div className={`w-4 h-4 rounded-full border-2 ${selectedLocation === id ? 'border-amber-400' : 'border-slate-500'}`} style={{ backgroundColor: loc.color }} />
+                            <span className={`absolute left-6 top-1/2 -translate-y-1/2 text-xs whitespace-nowrap ${selectedLocation === id ? 'text-amber-400' : 'text-slate-400 group-hover:text-slate-200'}`}>{loc.name}</span>
+                        </button>
+                    ))}
+                    <div className="absolute bottom-2 right-2 text-xs text-slate-500">Click a location for details</div>
+                </div>
+            );
+        };
+
+        const Timeline = ({ onEventSelect }) => {
+            const categoryColors = { era: 'bg-slate-600', crisis: 'bg-red-600', political: 'bg-blue-600', expansion: 'bg-green-600', war: 'bg-red-800', military: 'bg-indigo-600', technology: 'bg-purple-600', mystery: 'bg-slate-500', signal: 'bg-amber-600', mission: 'bg-amber-500' };
+            return (
+                <div className="space-y-1 max-h-[600px] overflow-y-auto pr-2">
+                    {worldData.timeline.map((event, i) => (
+                        <button key={i} onClick={() => onEventSelect(event)} className="w-full flex items-start gap-3 p-3 rounded-lg hover:bg-slate-800/50 transition-all text-left group">
+                            <div className="flex flex-col items-center">
+                                <div className={`w-3 h-3 rounded-full ${categoryColors[event.category] || 'bg-slate-600'}`} />
+                                {i < worldData.timeline.length - 1 && <div className="w-0.5 h-full bg-slate-700 mt-1" />}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <div className="flex items-baseline gap-2">
+                                    <span className="text-amber-400 font-mono text-sm">{event.year}</span>
+                                    <span className="text-slate-200 font-medium group-hover:text-amber-300 transition-colors">{event.title}</span>
+                                </div>
+                                <p className="text-slate-400 text-sm mt-1 line-clamp-2">{event.description}</p>
+                            </div>
+                            <span className="text-slate-600 group-hover:text-slate-400 mt-1 flex-shrink-0"><Icons.ChevronRight /></span>
+                        </button>
+                    ))}
+                </div>
+            );
+        };
+
+        const FactionCard = ({ faction, onClick }) => (
+            <button onClick={onClick} className="w-full p-4 rounded-lg border border-slate-700 hover:border-slate-500 bg-slate-800/50 hover:bg-slate-800 transition-all text-left group">
+                <div className="flex items-center gap-3">
+                    <div className="w-4 h-4 rounded-full flex-shrink-0" style={{ backgroundColor: faction.color }} />
+                    <div className="flex-1 min-w-0">
+                        <h3 className="text-slate-200 font-medium group-hover:text-amber-300 transition-colors truncate">{faction.name}</h3>
+                        {faction.population && <p className="text-slate-500 text-sm">{faction.population}</p>}
+                        {faction.revenue && <p className="text-slate-500 text-sm">{faction.revenue} · {faction.employees}</p>}
+                    </div>
+                    <span className="text-slate-600 group-hover:text-slate-400 flex-shrink-0"><Icons.ChevronRight /></span>
+                </div>
+            </button>
+        );
+
+        const DetailPanel = ({ type, data, onClose }) => {
+            if (!data) return null;
+            return (
+                <div className="bg-slate-800 rounded-lg border border-slate-700 p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-semibold text-slate-100">{data.name || data.title}</h3>
+                        <button onClick={onClose} className="text-slate-500 hover:text-slate-300"><Icons.X /></button>
+                    </div>
+                    {data.population && <p className="text-amber-400 text-sm">Population: {data.population}</p>}
+                    {data.status && <p className="text-slate-400 text-sm">{data.status}</p>}
+                    {data.philosophy && <p className="text-slate-400 text-sm italic">{data.philosophy}</p>}
+                    <p className="text-slate-300 text-sm leading-relaxed">{data.description}</p>
+                    {data.business && <p className="text-slate-500 text-sm">Business: {data.business}</p>}
+                    {data.threat && <p className={`text-sm ${data.threat === 'high' ? 'text-red-400' : data.threat === 'medium' ? 'text-yellow-400' : 'text-green-400'}`}>Threat Level: {data.threat.toUpperCase()}</p>}
+                </div>
+            );
+        };
+
+        const CodexEntry = ({ entry, onBack }) => (
+            <div className="space-y-4">
+                <button onClick={onBack} className="flex items-center gap-2 text-slate-400 hover:text-amber-400 transition-colors">
+                    <Icons.ArrowLeft /><span>Back</span>
+                </button>
+                <div className="flex items-center gap-3">
+                    <CodexIcon name={entry.icon} className="text-amber-400" />
+                    <div>
+                        <h2 className="text-2xl font-bold text-slate-100">{entry.title}</h2>
+                        <p className="text-slate-500 text-sm">{entry.category}</p>
+                    </div>
+                </div>
+                <div className="prose-custom text-slate-300 text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: entry.content }} />
+            </div>
+        );
+
+        // ============ MAIN APP ============
+
+        function LongwatchBibleApp() {
+            const [activeTab, setActiveTab] = useState('codex');
+            const [searchQuery, setSearchQuery] = useState('');
+            const [selectedLocation, setSelectedLocation] = useState(null);
+            const [selectedEvent, setSelectedEvent] = useState(null);
+            const [selectedFaction, setSelectedFaction] = useState(null);
+            const [selectedCodex, setSelectedCodex] = useState(null);
+
+            const codexEntries = Object.entries(worldData.codex);
+
+            const filteredCodex = useMemo(() => {
+                if (!searchQuery) return codexEntries;
+                const q = searchQuery.toLowerCase();
+                return codexEntries.filter(([key, entry]) => entry.title.toLowerCase().includes(q) || entry.content.toLowerCase().includes(q) || entry.category.toLowerCase().includes(q));
+            }, [searchQuery, codexEntries]);
+
+            const renderContent = () => {
+                switch (activeTab) {
+                    case 'map':
+                        return (
+                            <div className="space-y-4">
+                                <h2 className="text-xl font-semibold text-slate-100">Solar System</h2>
+                                <SolarSystemMap onLocationSelect={setSelectedLocation} selectedLocation={selectedLocation} />
+                                {selectedLocation && <DetailPanel type="location" data={worldData.locations[selectedLocation]} onClose={() => setSelectedLocation(null)} />}
+                            </div>
+                        );
+                    case 'timeline':
+                        return (
+                            <div className="space-y-4">
+                                <h2 className="text-xl font-semibold text-slate-100">Timeline: 2025-2226</h2>
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                    <Timeline onEventSelect={setSelectedEvent} />
+                                    {selectedEvent && <DetailPanel type="event" data={selectedEvent} onClose={() => setSelectedEvent(null)} />}
+                                </div>
+                            </div>
+                        );
+                    case 'factions':
+                        return (
+                            <div className="space-y-6">
+                                <div>
+                                    <h2 className="text-xl font-semibold text-slate-100 mb-3">Earth Blocs</h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                        {worldData.factions.blocs.map(bloc => <FactionCard key={bloc.id} faction={bloc} onClick={() => setSelectedFaction(bloc)} />)}
+                                    </div>
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-semibold text-slate-100 mb-3">Megacorporations</h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                        {worldData.factions.corps.map(corp => <FactionCard key={corp.id} faction={corp} onClick={() => setSelectedFaction(corp)} />)}
+                                    </div>
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-semibold text-slate-100 mb-3">Organizations</h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                        {worldData.factions.orgs.map(org => <FactionCard key={org.id} faction={org} onClick={() => setSelectedFaction(org)} />)}
+                                    </div>
+                                </div>
+                                {selectedFaction && <DetailPanel type="faction" data={selectedFaction} onClose={() => setSelectedFaction(null)} />}
+                            </div>
+                        );
+                    case 'codex':
+                    default:
+                        if (selectedCodex) {
+                            return <CodexEntry entry={worldData.codex[selectedCodex]} onBack={() => setSelectedCodex(null)} />;
+                        }
+                        return (
+                            <div className="space-y-4">
+                                <div className="relative">
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Search /></span>
+                                    <input type="text" placeholder="Search codex..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500" />
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                    {filteredCodex.map(([key, entry]) => (
+                                        <button key={key} onClick={() => setSelectedCodex(key)} className="flex items-center gap-3 p-4 rounded-lg border border-slate-700 hover:border-slate-500 bg-slate-800/50 hover:bg-slate-800 transition-all text-left group">
+                                            <CodexIcon name={entry.icon} className="text-amber-400" />
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className="text-slate-200 font-medium group-hover:text-amber-300 transition-colors">{entry.title}</h3>
+                                                <p className="text-slate-500 text-sm">{entry.category}</p>
+                                            </div>
+                                            <span className="text-slate-600 group-hover:text-slate-400 flex-shrink-0"><Icons.ChevronRight /></span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                }
+            };
+
+            return (
+                <div className="min-h-screen bg-slate-900 text-slate-100">
+                    <header className="bg-slate-950 border-b border-slate-800">
+                        <div className="max-w-6xl mx-auto px-4">
+                            <div className="flex items-center justify-between py-4">
+                                <div>
+                                    <h1 className="text-xl font-bold text-amber-400">THE LONGWATCH CHRONICLES</h1>
+                                    <p className="text-slate-500 text-sm">World Bible · 2225-2226</p>
+                                </div>
+                            </div>
+                            <div className="flex gap-1 -mb-px">
+                                <TabButton active={activeTab === 'codex'} onClick={() => { setActiveTab('codex'); setSelectedCodex(null); }} icon={Icons.Book} label="Codex" />
+                                <TabButton active={activeTab === 'map'} onClick={() => setActiveTab('map')} icon={Icons.MapPin} label="Map" />
+                                <TabButton active={activeTab === 'timeline'} onClick={() => setActiveTab('timeline')} icon={Icons.Clock} label="Timeline" />
+                                <TabButton active={activeTab === 'factions'} onClick={() => setActiveTab('factions')} icon={Icons.Users} label="Factions" />
+                            </div>
+                        </div>
+                    </header>
+                    <main className="max-w-6xl mx-auto px-4 py-6">{renderContent()}</main>
+                    <footer className="bg-slate-950 border-t border-slate-800 py-4 mt-8">
+                        <div className="max-w-6xl mx-auto px-4 text-center text-slate-600 text-sm">"I am Longwatch. I carry humanity into the dark, and I will bring it home again."</div>
+                    </footer>
+                </div>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<LongwatchBibleApp />);
+    </script>
+</body>
+</html>
